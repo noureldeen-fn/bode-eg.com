@@ -95,7 +95,7 @@
             >HOME</a
           >
           <a
-            href="/projects"
+            href="/properties"
             class="text-xl hover:text-bode-sunlit transition w-full text-center py-4 border-b border-bode-sunlit/10"
             >PROPERTIES</a
           >
@@ -126,102 +126,222 @@
     </header>
 
     <section class="container mx-auto px-6 pb-20">
-      <div class="grid md:grid-cols-3 gap-10">
-        <div
-          class="group bg-white rounded-[20px] overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100"
-        >
-          <div class="relative h-64 overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-              alt="Villa"
-              class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
-            />
-            <div
-              class="absolute top-4 right-4 bg-bode-crimson text-white text-xs font-bold px-3 py-1 rounded-full uppercase"
-            >
-              For Sale
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-2">Modern Family Villa</h3>
-            <p class="text-gray-500 text-sm mb-4">5th Settlement, New Cairo</p>
-            <div
-              class="flex justify-between items-center border-t border-gray-100 pt-4"
-            >
-              <span class="text-bode-midnight font-black text-lg"
-                >31,000,000 EGP</span
-              >
-              <a
-                href="contact.html"
-                class="text-bode-crimson font-bold text-sm hover:underline"
-                >Details &rarr;</a
-              >
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="group bg-white rounded-[20px] overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100"
-        >
-          <div class="relative h-64 overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-              alt="Apartment"
-              class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
-            />
-            <div
-              class="absolute top-4 right-4 bg-bode-sunlit text-bode-midnight text-xs font-bold px-3 py-1 rounded-full uppercase"
-            >
-              New Launch
-            </div>
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-2">Luxury Apartment</h3>
-            <p class="text-gray-500 text-sm mb-4">New Capital, R7</p>
-            <div
-              class="flex justify-between items-center border-t border-gray-100 pt-4"
-            >
-              <span class="text-bode-midnight font-black text-lg"
-                >7,200,000 EGP</span
-              >
-              <a
-                href="contact.html"
-                class="text-bode-crimson font-bold text-sm hover:underline"
-                >Details &rarr;</a
-              >
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="group bg-white rounded-[20px] overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100"
-        >
-          <div class="relative h-64 overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-              alt="Duplex"
-              class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500"
-            />
-          </div>
-          <div class="p-6">
-            <h3 class="text-xl font-bold mb-2">Garden Duplex</h3>
-            <p class="text-gray-500 text-sm mb-4">Zayed City</p>
-            <div
-              class="flex justify-between items-center border-t border-gray-100 pt-4"
-            >
-              <span class="text-bode-midnight font-black text-lg"
-                >14,350,000 EGP</span
-              >
-              <a
-                href="contact.html"
-                class="text-bode-crimson font-bold text-sm hover:underline"
-                >Details &rarr;</a
-              >
-            </div>
-          </div>
-        </div>
+      <div id="properties-container" class="grid md:grid-cols-3 gap-10">
+        <p class="text-center col-span-3 text-gray-500 animate-pulse">
+          Loading Properties...
+        </p>
       </div>
     </section>
+
+    <script>
+      // ============================================
+      // 1. إعدادات التصميم (CSS ذكي للموبايل والكمبيوتر)
+      // ============================================
+      const style = document.createElement("style");
+      style.innerHTML = `
+    .arrow-btn { transition: opacity 0.3s ease-in-out; }
+    
+    /* للكمبيوتر: الأسهم مختفية وتظهر لما تقف بالماوس */
+    @media (min-width: 768px) {
+      .arrow-btn { opacity: 0; }
+      .property-card:hover .arrow-btn { opacity: 1; }
+    }
+
+    /* للموبايل: الأسهم ظاهرة علطول (عشان مفيش hover) */
+    @media (max-width: 767px) {
+      .arrow-btn { opacity: 1; }
+    }
+  `;
+      document.head.appendChild(style);
+
+      // ============================================
+      // 2. إعدادات Sanity
+      // ============================================
+      const PROJECT_ID = "bq3lz493";
+      const DATASET = "production";
+      const QUERY = encodeURIComponent(
+        '*[_type == "property"]{title, location, price, description, "mainImage": mainImage.asset->url, "gallery": gallery[].asset->url}',
+      );
+      const URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`;
+
+      // متغيرات لحساب السحب (Swipe)
+      window.slidersData = {};
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      async function fetchProperties() {
+        const container = document.getElementById("properties-container");
+        try {
+          const response = await fetch(URL);
+          const data = await response.json();
+          const properties = data.result;
+
+          container.innerHTML = "";
+
+          if (properties.length === 0) {
+            container.innerHTML =
+              '<p class="text-center col-span-3">No properties found.</p>';
+            return;
+          }
+
+          properties.forEach((prop, index) => {
+            const galleryImages = prop.gallery || [];
+            const allImages = [prop.mainImage, ...galleryImages].filter(
+              Boolean,
+            );
+
+            if (allImages.length === 0)
+              allImages.push("https://via.placeholder.com/800x600");
+
+            const cardId = `card-${index}`;
+            window.slidersData[cardId] = { images: allImages, current: 0 };
+
+            let formattedPrice = prop.price
+              ? prop.price.toLocaleString() + " EGP"
+              : "Call for Price";
+            let shortDesc = prop.description
+              ? prop.description.substring(0, 100) + "..."
+              : "";
+
+            // =======================================================
+            // أزرار التحكم
+            // =======================================================
+            let controlsHTML = "";
+            if (allImages.length > 1) {
+              controlsHTML = `
+                <button onclick="changeSlide('${cardId}', -1)" 
+                    class="arrow-btn"
+                    style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 9999; background-color: rgba(0,0,0,0.6); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+                    ❮
+                </button>
+                
+                <button onclick="changeSlide('${cardId}', 1)" 
+                    class="arrow-btn"
+                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 9999; background-color: rgba(0,0,0,0.6); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+                    ❯
+                </button>
+                
+                <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; gap: 5px;">
+                    ${allImages
+                      .map(
+                        (_, i) =>
+                          `<span id="${cardId}-dot-${i}" style="width: 8px; height: 8px; border-radius: 50%; background-color: ${i === 0 ? "white" : "rgba(255,255,255,0.5)"}; display: block; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3);" onclick="goToSlide('${cardId}', ${i})"></span>`,
+                      )
+                      .join("")}
+                </div>
+            `;
+            }
+
+            // =======================================================
+            // الكارت (إضافة حساسات اللمس ontouchstart و ontouchend)
+            // =======================================================
+            const cardHTML = `
+        <div class="group property-card bg-white rounded-[20px] overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 border border-gray-100 flex flex-col h-full relative" id="${cardId}">
+          
+          <div class="relative h-64 shrink-0" style="position: relative;"
+               ontouchstart="recordTouchStart(event)" 
+               ontouchend="detectSwipe(event, '${cardId}')">
+               
+            <img 
+              id="${cardId}-img"
+              src="${allImages[0]}" 
+              alt="${prop.title}" 
+              class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 ease-in-out relative z-10"
+              style="pointer-events: none;" 
+            />
+            <div class="absolute top-4 right-4 bg-bode-crimson text-white text-xs font-bold px-3 py-1 rounded-full uppercase z-40 shadow-md">
+              For Sale
+            </div>
+
+            ${controlsHTML}
+          </div>
+
+          <div class="p-6 flex flex-col flex-grow relative z-30 bg-white">
+            <h3 class="text-xl font-bold mb-2 text-bode-midnight">${prop.title}</h3>
+            <p class="text-bode-sunlit font-semibold text-sm mb-2">📍 ${prop.location}</p>
+            <p class="text-gray-500 text-sm mb-4 line-clamp-2">${shortDesc}</p>
+            
+            <div class="flex justify-between items-center border-t border-gray-100 pt-4 mt-auto">
+              <span class="text-bode-midnight font-black text-lg">${formattedPrice}</span>
+              <a href="contact.html" class="text-bode-crimson font-bold text-sm hover:underline">Buy Now &rarr;</a>
+            </div>
+          </div>
+        </div>
+        `;
+
+            container.innerHTML += cardHTML;
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      // ============================================
+      // 3. دوال التحكم واللمس (Swipe Logic)
+      // ============================================
+
+      // تسجيل نقطة بداية اللمس
+      window.recordTouchStart = function (e) {
+        touchStartX = e.changedTouches[0].screenX;
+      };
+
+      // تسجيل نقطة النهاية وتنفيذ الحركة
+      window.detectSwipe = function (e, cardId) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipeGesture(cardId);
+      };
+
+      function handleSwipeGesture(cardId) {
+        // لو السحبة كانت قوية كفاية (أكتر من 50 بيكسل)
+        if (touchEndX < touchStartX - 50) {
+          changeSlide(cardId, 1); // سحب للشمال -> التالي
+        }
+        if (touchEndX > touchStartX + 50) {
+          changeSlide(cardId, -1); // سحب لليمين -> السابق
+        }
+      }
+
+      window.changeSlide = function (cardId, direction) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        const data = window.slidersData[cardId];
+        if (!data) return;
+
+        let newIndex = data.current + direction;
+        if (newIndex >= data.images.length) newIndex = 0;
+        if (newIndex < 0) newIndex = data.images.length - 1;
+
+        updateUI(cardId, newIndex);
+      };
+
+      window.goToSlide = function (cardId, index) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        updateUI(cardId, index);
+      };
+
+      function updateUI(cardId, index) {
+        const data = window.slidersData[cardId];
+        data.current = index;
+
+        const img = document.getElementById(`${cardId}-img`);
+        if (img) img.src = data.images[index];
+
+        data.images.forEach((_, i) => {
+          const dot = document.getElementById(`${cardId}-dot-${i}`);
+          if (dot)
+            dot.style.backgroundColor =
+              i === index ? "white" : "rgba(255,255,255,0.5)";
+        });
+      }
+
+      fetchProperties();
+    </script>
+
     <footer
       class="bg-bode-midnight text-white pt-14 pb-6 border-t border-gray-800"
     >
@@ -250,7 +370,7 @@
                 <a href="/" class="hover:text-white transition">Home</a>
               </li>
               <li>
-                <a href="/projects" class="hover:text-white transition"
+                <a href="/properties" class="hover:text-white transition"
                   >Properties</a
                 >
               </li>
