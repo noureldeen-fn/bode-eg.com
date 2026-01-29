@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bode-eg.com/sitemap.xml
