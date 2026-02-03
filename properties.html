@@ -28,24 +28,6 @@
 
     <link href="./output.css" rel="stylesheet" />
     <link rel="stylesheet" href="custom.css" />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://bode-eg.com/" />
-    <meta
-      property="og:image"
-      content="https://bode-eg.com/social-preview.jpg"
-    />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="BODE | Real Estate Investment" />
-    <meta
-      name="twitter:description"
-      content="Discover premium real estate opportunities in Egypt."
-    />
-    <meta
-      name="twitter:image"
-      content="https://bode-eg.com/social-preview.jpg"
-    />
   </head>
   <body class="bg-bode-ivory text-bode-midnight font-sans antialiased">
     <nav
@@ -235,17 +217,17 @@
               controlsHTML = `
                 <button onclick="changeSlide('${cardId}', -1)" 
                     class="arrow-btn"
-                    style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 9999; background-color: rgba(0,0,0,0.6); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+                    style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 25; background-color: rgba(0,0,0,0.6); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
                     ❮
                 </button>
                 
                 <button onclick="changeSlide('${cardId}', 1)" 
                     class="arrow-btn"
-                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 9999; background-color: rgba(0,0,0,0.6); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 25; background-color: rgba(0,0,0,0.6); color: white; width: 35px; height: 35px; border-radius: 50%; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
                     ❯
                 </button>
                 
-                <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; gap: 5px;">
+                <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); z-index: 25; display: flex; gap: 5px;">
                     ${allImages
                       .map(
                         (_, i) =>
