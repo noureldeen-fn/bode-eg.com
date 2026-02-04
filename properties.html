@@ -166,7 +166,7 @@
       const PROJECT_ID = "bq3lz493";
       const DATASET = "production";
       const QUERY = encodeURIComponent(
-        '*[_type == "property"]{title, location, price, description, "mainImage": mainImage.asset->url, "gallery": gallery[].asset->url}',
+        '*[_type == "property"]{title, location, price, badge, beds, baths, area, paymentPlan, "mainImage": mainImage.asset->url, "developerLogoUrl": developerLogo.asset->url, "gallery": gallery[].asset->url}',
       );
       const URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`;
 
@@ -243,7 +243,7 @@
             // تصميم الكارت الجديد (Nawy Style)
             // =======================================================
             const cardHTML = `
-        <div class="group property-card bg-white rounded-[20px] overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.1)] transition duration-300 border border-gray-100 flex flex-col h-full relative" id="${cardId}">
+        <div class="group property-card bg-white rounded-[20px] overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:-translate-y-1 transition duration-300 border border-gray-100 flex flex-col h-full relative" id="${cardId}">
           
           <div class="relative h-56 shrink-0" style="position: relative;"
                ontouchstart="recordTouchStart(event)" 
@@ -257,10 +257,21 @@
               style="pointer-events: none;" 
             />
             
-            <div class="absolute top-4 right-4 bg-bode-crimson text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase z-40 shadow-md tracking-wider">
-              New Launch
-            </div>
+            ${(() => {
+              if (!prop.badge) return ""; // لو مفيش نص، ميرسمش حاجة
 
+              const bg = prop.badgeColor || "#8A321D"; // اللون المختار (أو الأحمر كاحتياطي)
+              // لو اللون أصفر أو أوف وايت -> خلي الكلام كحلي، غير كده خليه أبيض
+              const txtColor =
+                bg === "#F0C689" || bg === "#FBF6E9" ? "#182E44" : "#FFFFFF";
+
+              return `
+                <div class="absolute top-4 right-4 text-[10px] font-bold px-3 py-1 rounded-full uppercase z-40 shadow-md tracking-wider"
+                     style="background-color: ${bg}; color: ${txtColor};">
+                  ${prop.badge}
+                </div>
+                `;
+            })()}
             ${controlsHTML}
           </div>
 
@@ -268,12 +279,21 @@
             
             <div class="flex items-center gap-4 mb-4 mt-2">
                 <div class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center shrink-0">
-                    <span class="text-[8px] text-gray-500 font-bold">LOGO</span>
+                    ${
+                      prop.developerLogoUrl
+                        ? `<img src="${prop.developerLogoUrl}" class="w-full h-full object-cover">`
+                        : `<span class="text-[8px] text-gray-500 font-bold">LOGO</span>`
+                    }
                 </div>
                 
                 <div>
-                    <h3 class="text-lg font-bold text-bode-midnight leading-tight">${prop.title}</h3>
-                    <p class="text-gray-400 text-xs mt-1">${prop.location}</p>
+                    <p style="color: #182E44; opacity: 0.6; font-size: 12px; font-weight: 600; margin-bottom: 2px;">
+                        ${prop.location}
+                    </p>
+
+                    <h3 style="color: #182E44; font-size: 18px; font-weight: 800; margin: 0; line-height: 1.2;">
+                        ${prop.title}
+                    </h3>
                 </div>
             </div>
 
@@ -284,7 +304,7 @@
                         <path d="M6 5.91211H18C18.5233 5.91211 18.9687 6.09764 19.3418 6.4707C19.7149 6.84377 19.9004 7.28923 19.9004 7.8125V10.9121H20C20.5233 10.9121 20.9687 11.0976 21.3418 11.4707C21.7149 11.8438 21.9004 12.2892 21.9004 12.8125V17.7129H20.5771L20.5547 17.7812L19.9277 19.7129H19.0723L18.4453 17.7812L18.4229 17.7129H5.57715L5.55469 17.7812L4.92773 19.7129H4.07227L3.44531 17.7812L3.42285 17.7129H2.09961V12.7871C2.0997 12.2641 2.28503 11.8233 2.65723 11.459C3.03013 11.094 3.47604 10.9121 4 10.9121H4.09961V7.8125C4.09961 7.28923 4.28514 6.84377 4.6582 6.4707C5.03127 6.09764 5.47673 5.91211 6 5.91211ZM3.90039 15.9121H20.0996V12.7129H3.90039V15.9121ZM5.90039 10.9121H11.0996V7.71289H5.90039V10.9121ZM12.9004 10.9121H18.0996V7.71289H12.9004V10.9121Z" 
                         fill="#FDC689" stroke="white" stroke-width="0.2"></path>
                     </svg>
-                    <span style="font-size: 14px; font-weight: bold; color: #374151; line-height: 1;">3 Beds</span>
+                    <span style="font-size: 14px; font-weight: bold; color: #182E44; opacity: 0.85; line-height: 1;">${prop.beds || 0} Beds</span>
                 </div>
 
                 <div style="width: 1px; height: 30px; background-color: #E5E7EB;"></div>
@@ -294,7 +314,7 @@
                         <path d="M8 19.9121C8.25815 19.9121 8.46961 19.9989 8.6416 20.1709C8.81359 20.3429 8.90039 20.5544 8.90039 20.8125C8.90039 21.0706 8.81359 21.2821 8.6416 21.4541C8.46961 21.6261 8.25815 21.7129 8 21.7129C7.74185 21.7129 7.53039 21.6261 7.3584 21.4541C7.18641 21.2821 7.09961 21.0706 7.09961 20.8125C7.09961 20.5544 7.18641 20.3429 7.3584 20.1709C7.53039 19.9989 7.74185 19.9121 8 19.9121ZM12 19.9121C12.2582 19.9121 12.4696 19.9989 12.6416 20.1709C12.8136 20.3429 12.9004 20.5544 12.9004 20.8125C12.9004 21.0706 12.8136 21.2821 12.6416 21.4541C12.4696 21.6261 12.2582 21.7129 12 21.7129C11.7419 21.7129 11.5304 21.6261 11.3584 21.4541C11.1864 21.2821 11.0996 21.0706 11.0996 20.8125C11.0996 20.5544 11.1864 20.3429 11.3584 20.1709C11.5304 19.9989 11.7419 19.9121 12 19.9121ZM16 19.9121C16.2582 19.9121 16.4696 19.9989 16.6416 20.1709C16.8136 20.3429 16.9004 20.5544 16.9004 20.8125C16.9004 21.0706 16.8136 21.2821 16.6416 21.4541C16.4696 21.6261 16.2582 21.7129 16 21.7129C15.7419 21.7129 15.5304 21.6261 15.3584 21.4541C15.1864 21.2821 15.0996 21.0706 15.0996 20.8125C15.0996 20.5544 15.1864 20.3429 15.3584 20.1709C15.5304 19.9989 15.7419 19.9121 16 19.9121ZM8 16.9121C8.25815 16.9121 8.46961 16.9989 8.6416 17.1709C8.81359 17.3429 8.90039 17.5544 8.90039 17.8125C8.90039 18.0707 8.81359 18.2821 8.6416 18.4541C8.46961 18.6261 8.25815 18.7129 8 18.7129C7.74185 18.7129 7.53039 18.6261 7.3584 18.4541C7.18641 18.2821 7.09961 18.0707 7.09961 17.8125C7.09961 17.5544 7.18641 17.3429 7.3584 17.1709C7.53039 16.9989 7.74185 16.9121 8 16.9121ZM12 16.9121C12.2581 16.9121 12.4696 16.9989 12.6416 17.1709C12.8136 17.3429 12.9004 17.5544 12.9004 17.8125C12.9004 18.0707 12.8136 18.2821 12.6416 18.4541C12.4696 18.6261 12.2582 18.7129 12 18.7129C11.7418 18.7129 11.5304 18.6261 11.3584 18.4541C11.1864 18.2821 11.0996 18.0707 11.0996 17.8125C11.0996 17.5544 11.1864 17.3429 11.3584 17.1709C11.5304 16.9989 11.7419 16.9121 12 16.9121ZM16 16.9121C16.2582 16.9121 16.4696 16.9989 16.6416 17.1709C16.8136 17.3429 16.9004 17.5544 16.9004 17.8125C16.9004 18.0707 16.8136 18.2821 16.6416 18.4541C16.4696 18.6261 16.2582 18.7129 16 18.7129C15.7419 18.7129 15.5304 18.6261 15.3584 18.4541C15.1864 18.2821 15.0996 18.0707 15.0996 17.8125C15.0996 17.5544 15.1864 17.3429 15.3584 17.1709C15.5304 16.9989 15.7419 16.9121 16 16.9121ZM12 3.91211C12.2581 3.91211 12.4696 3.99891 12.6416 4.1709C12.8136 4.34289 12.9004 4.55435 12.9004 4.8125V6L12.9863 6.01172C14.696 6.24187 16.1075 6.99689 17.2246 8.27832C18.3416 9.55962 18.9004 11.0694 18.9004 12.8125V13.8125C18.9004 14.0707 18.8136 14.2821 18.6416 14.4541C18.4696 14.6261 18.2582 14.7129 18 14.7129H6C5.74185 14.7129 5.53039 14.6261 5.3584 14.4541C5.18641 14.2821 5.09961 14.0707 5.09961 13.8125V12.8125C5.09961 11.0694 5.65838 9.55962 6.77539 8.27832C7.89253 6.99689 9.30401 6.24187 11.0137 6.01172L11.0996 6V4.8125C11.0996 4.55435 11.1864 4.34289 11.3584 4.1709C11.5304 3.99891 11.7419 3.91211 12 3.91211ZM12 7.71289C10.5902 7.71289 9.38542 8.21028 8.3916 9.2041C7.39778 10.1979 6.90039 11.4027 6.90039 12.8125V12.9121H17.0996V12.8125C17.0996 11.4027 16.6022 10.1979 15.6084 9.2041C14.6146 8.21028 13.4098 7.71289 12 7.71289Z" 
                         fill="#FDC689" stroke="white" stroke-width="0.2"></path>
                     </svg>
-                    <span style="font-size: 14px; font-weight: bold; color: #374151; line-height: 1;">2 Baths</span>
+                    <span style="font-size: 14px; font-weight: bold; color: #182E44; opacity: 0.85; line-height: 1;">${prop.baths || 0} Baths</span>
                 </div>
 
                 <div style="width: 1px; height: 30px; background-color: #E5E7EB;"></div>
@@ -304,21 +324,21 @@
                         <path d="M4.91699 4.91211H18.25C18.7488 4.91211 19.1742 5.09634 19.5312 5.46875C19.8885 5.84151 20.0664 6.28789 20.0664 6.8125V18.8125C20.0664 19.3371 19.8885 19.7835 19.5312 20.1562C19.1742 20.5287 18.7488 20.7129 18.25 20.7129H4.91699C4.41805 20.7129 3.99187 20.5289 3.63477 20.1562C3.27753 19.7835 3.09961 19.3371 3.09961 18.8125V6.8125C3.09961 6.28789 3.27753 5.84151 3.63477 5.46875C3.99187 5.09612 4.41805 4.91211 4.91699 4.91211ZM4.81641 18.9121H18.3496V6.71289H4.81641V18.9121ZM17.1914 12.9121V17.7129H12.5996V15.9121H15.4746V12.9121H17.1914ZM10.5664 7.91211V9.71289H7.69141V12.7129H5.97461V7.91211H10.5664Z" 
                         fill="#FDC689" stroke="white" stroke-width="0.2"></path>
                     </svg>
-                    <span style="font-size: 14px; font-weight: bold; color: #374151; line-height: 1;">165 m²</span>
+                    <span style="font-size: 14px; font-weight: bold; color: #182E44; opacity: 0.85; line-height: 1;">${prop.area || 0} m²</span>
                 </div>
 
             </div>
 
             <div style="padding: 0 4px; margin-top: 5px;">
                 
-                <p style="font-size: 15px; color: #182E44; font-weight: 700; margin-bottom: 5px;">
-                    18,500 Monthly / 8 Years
+                <p style="font-size: 15px; color: #182E44; opacity: 0.6; font-weight: 700; margin-bottom: 5px;">
+                    ${prop.paymentPlan || "Cash / Installments"}
                 </p>
                 
                 <div style="display: flex; align-items: flex-end; justify-content: space-between;">
                     
                     <div>
-                        <span style="font-size: 24px; font-weight: 900; color: #111827; line-height: 1.2;">
+                        <span style="font-size: 24px; font-weight: 900; color: #182E44; line-height: 1.2;">
                             ${formattedPrice}
                         </span>
                     </div>
