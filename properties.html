@@ -166,7 +166,7 @@
       const PROJECT_ID = "bq3lz493";
       const DATASET = "production";
       const QUERY = encodeURIComponent(
-        '*[_type == "property"]{title, location, price, badge, beds, baths, area, paymentPlan, "mainImage": mainImage.asset->url, "developerLogoUrl": developerLogo.asset->url, "gallery": gallery[].asset->url}',
+        '*[_type == "property"]{title, location, price, badge, badgeColor, beds, baths, area, paymentPlan, "mainImage": mainImage.asset->url, "developerLogoUrl": developerLogo.asset->url, "gallery": gallery[].asset->url}',
       );
       const URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`;
 
@@ -206,10 +206,6 @@
               ? prop.price.toLocaleString()
               : "Call for Price"; // شيلنا كلمة EGP من هنا عشان هنحطها بتنسيق خاص تحت
 
-            let shortDesc = prop.description
-              ? prop.description.substring(0, 100) + "..."
-              : "";
-
             // =======================================================
             // أزرار التحكم (السلايدر)
             // =======================================================
@@ -243,7 +239,7 @@
             // تصميم الكارت الجديد (Nawy Style)
             // =======================================================
             const cardHTML = `
-        <div class="group property-card bg-white rounded-[20px] overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:-translate-y-1 transition duration-300 border border-gray-100 flex flex-col h-full relative" id="${cardId}">
+        <div class="group property-card bg-white rounded-[20px] overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.05)] hover:shadow-2xl hover:-translate-y-1 transition duration-300 border border-gray-100 flex flex-col h-full relative transform-gpu" id="${cardId}" style="transform: translateZ(0); -webkit-mask-image: -webkit-radial-gradient(white, black);">
           
           <div class="relative h-56 shrink-0" style="position: relative;"
                ontouchstart="recordTouchStart(event)" 
@@ -266,10 +262,17 @@
                 bg === "#F0C689" || bg === "#FBF6E9" ? "#182E44" : "#FFFFFF";
 
               return `
-                <div class="absolute top-4 right-4 text-[10px] font-bold px-3 py-1 rounded-full uppercase z-40 shadow-md tracking-wider"
-                     style="background-color: ${bg}; color: ${txtColor};">
-                  ${prop.badge}
-                </div>
+            ${(() => {
+              if (!prop.badge) return "";
+              const bg = prop.badgeColor || "#8A321D";
+              const txtColor =
+                bg === "#F0C689" || bg === "#FBF6E9" ? "#182E44" : "#FFFFFF";
+              return `
+                            <div class="absolute top-4 right-4 text-[10px] font-bold px-3 py-1 rounded-full uppercase z-40 shadow-md tracking-wider"
+                                 style="background-color: ${bg}; color: ${txtColor};">
+                              ${prop.badge}
+                            </div>`;
+            })()}
                 `;
             })()}
             ${controlsHTML}
@@ -278,10 +281,10 @@
           <div class="p-6 flex flex-col flex-grow relative z-30 bg-white">
             
             <div class="flex items-center gap-4 mb-4 mt-2">
-                <div class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center shrink-0">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden bg-white shadow-sm">
                     ${
                       prop.developerLogoUrl
-                        ? `<img src="${prop.developerLogoUrl}" class="w-full h-full object-cover">`
+                        ? `<img src="${prop.developerLogoUrl}" class="w-full h-full object-contain transform scale-110">`
                         : `<span class="text-[8px] text-gray-500 font-bold">LOGO</span>`
                     }
                 </div>
@@ -364,7 +367,7 @@
         </div>
         `;
 
-            container.innerHTML += cardHTML;
+            container.insertAdjacentHTML("beforeend", cardHTML);
           });
         } catch (error) {
           console.error(error);
@@ -470,9 +473,9 @@
                 >
               </li>
               <li>
-                <a href="index.html#about" class="hover:text-white transition">
-                  Our Vision
-                </a>
+                <a href="#about" class="hover:text-white transition"
+                  >Our Vision</a
+                >
               </li>
               <li>
                 <a href="/contact" class="hover:text-white transition"
@@ -491,20 +494,43 @@
             <div class="space-y-4 text-sm text-gray-300">
               <div class="flex items-start space-x-3">
                 <span class="opacity-50">📍</span>
-                <span class="leading-tight"
-                  >TOP 90 MALL, 90TH STREET NORTH,<br />OFFICE 323, 3RD
-                  FLOOR,<br />Cairo, Egypt</span
+                <a
+                  href="https://www.google.com/maps/place/Top+90+Mall/@30.0261778,31.4900984,17z/data=!4m6!3m5!1s0x145823ccb03e4d4f:0xe41be80df554a320!8m2!3d30.025732!4d31.4900438!16s%2Fg%2F11fkf24cpp?entry=ttu&g_ep=EgoyMDI2MDIwMS4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  class="leading-tight hover:text-white transition"
                 >
+                  TOP 90 MALL, 90TH STREET SOUTH,<br />OFFICE 323, 3RD FLOOR,<br />Cairo,
+                  Egypt
+                </a>
               </div>
 
               <div class="flex items-center space-x-3">
-                <span class="opacity-50">✉️</span>
-                <a
-                  href="https://mail.google.com/mail/u/0/?fs=1&to=bodeforrealestateinvestment@gmail.com&tf=cm"
-                  target="_blank"
-                  class="hover:text-white transition"
-                  >bodeforrealestateinvestment@gmail.com</a
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#8A321D"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
+                  <path
+                    d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                  ></path>
+                  <path
+                    d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                  ></path>
+                </svg>
+
+                <a
+                  href="https://linktr.ee/BODERealty"
+                  target="_blank"
+                  class="hover:text-white transition text-base font-medium"
+                >
+                  BODE Links
+                </a>
               </div>
 
               <div class="flex items-center space-x-3">
