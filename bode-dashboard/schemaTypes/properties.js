@@ -19,7 +19,7 @@ export default {
     {
       name: 'price',
       title: 'Start Price (EGP)',
-      type: 'number',
+      type: 'string',
     },
 // 4. البادج (النص)
     {
@@ -55,17 +55,17 @@ export default {
     {
       name: 'beds',
       title: 'Number of Beds',
-      type: 'number',
+      type: 'string',
     },
     {
       name: 'baths',
       title: 'Number of Baths',
-      type: 'number',
+      type: 'string',
     },
     {
       name: 'area',
       title: 'Area (m²)',
-      type: 'number',
+      type: 'string',
     },
     // 7. تفاصيل خطة الدفع
     {
