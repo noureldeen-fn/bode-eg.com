@@ -215,8 +215,10 @@
             // دالة التنسيق (عشان تفهم الرقم من الشرطة)
             const formatVal = (val) => {
               if (!val) return "0";
-              if (val === "-") return "-";
-              return !isNaN(val) ? Number(val).toLocaleString() : val;
+              // السطر ده هو السحر: بيلاقي أي أرقام ويحط فيها فواصل ويسيب الحروف والشرط زي ما هي
+              return String(val).replace(/\d+/g, (n) =>
+                Number(n).toLocaleString(),
+              );
             };
 
             const bedsDisplay = formatVal(prop.beds);
@@ -225,10 +227,7 @@
 
             let formattedPrice = "Call for Price";
             if (prop.price) {
-              if (prop.price === "-") formattedPrice = "-";
-              else if (!isNaN(prop.price))
-                formattedPrice = Number(prop.price).toLocaleString();
-              else formattedPrice = prop.price;
+              formattedPrice = formatVal(prop.price);
             }
 
             // =======================================================
