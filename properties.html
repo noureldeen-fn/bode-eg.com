@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Manrope:wght@200..800&display=swap"
       rel="stylesheet"
     />
 
@@ -118,7 +118,7 @@
     <div class="h-32"></div>
 
     <header class="container mx-auto px-6 py-12 text-center">
-      <h1 class="text-4xl md:text-5xl font-black mb-4">
+      <h1 class="font-serif text-4xl md:text-5xl font-black mb-4">
         <span
           class="bg-clip-text text-transparent bg-gradient-to-r from-bode-crimson to-bode-midnight font-bold"
         >
@@ -166,7 +166,7 @@
       const PROJECT_ID = "bq3lz493";
       const DATASET = "production";
       const QUERY = encodeURIComponent(
-        '*[_type == "property"]{title, location, price, badge, badgeColor, beds, baths, area, paymentPlan, "mainImage": mainImage.asset->url, "developerLogoUrl": developerLogo.asset->url, "gallery": gallery[].asset->url}',
+        '*[_type == "property"]{title, location, price, badge, badgeColor, beds, baths, area, paymentPlan, "mainImage": mainImage.asset->url, "developerLogoUrl": developerLogo.asset->url, "gallery": gallery[].asset->url}'
       );
       const URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`;
 
@@ -193,7 +193,7 @@
           properties.forEach((prop, index) => {
             const galleryImages = prop.gallery || [];
             const allImages = [prop.mainImage, ...galleryImages].filter(
-              Boolean,
+              Boolean
             );
 
             // بداية كود التحميل المسبق (عشان التقليب يبقى سريع)
@@ -217,7 +217,7 @@
               if (!val) return "0";
               // السطر ده هو السحر: بيلاقي أي أرقام ويحط فيها فواصل ويسيب الحروف والشرط زي ما هي
               return String(val).replace(/\d+/g, (n) =>
-                Number(n).toLocaleString(),
+                Number(n).toLocaleString()
               );
             };
 
@@ -252,7 +252,7 @@
                     ${allImages
                       .map(
                         (_, i) =>
-                          `<span id="${cardId}-dot-${i}" style="width: 8px; height: 8px; border-radius: 50%; background-color: ${i === 0 ? "white" : "rgba(255,255,255,0.5)"}; display: block; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3);" onclick="goToSlide('${cardId}', ${i})"></span>`,
+                          `<span id="${cardId}-dot-${i}" style="width: 8px; height: 8px; border-radius: 50%; background-color: ${i === 0 ? "white" : "rgba(255,255,255,0.5)"}; display: block; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3);" onclick="goToSlide('${cardId}', ${i})"></span>`
                       )
                       .join("")}
                 </div>

@@ -11,10 +11,15 @@ module.exports = {
           sunlit: '#F0C689',   //  Accent Yellow
         }
       },
-      fontFamily: {
-        // هنستخدم Montserrat كبديل قوي ومجاني لـ Neris
-        sans: ['Cormorant Garamond', 'serif'],
-      },
+fontFamily: {
+        // 1. الخط الأساسي (لجسم الموقع والكلام الصغير) -> Manrope
+        // ده هيخلي الموقع شكله نضيف ومودرن
+        sans: ['Manrope', 'sans-serif'],
+        
+        // 2. خط العناوين (للفخامة) -> Cormorant Garamond
+        // ده هنستخدمه للعناوين الكبيرة بس
+        serif: ['"Cormorant Garamond"', 'serif'],
+    },
       backgroundImage: {
         // تدرج لوني فخم زي الموجود في صفحة 23
         'bode-gradient': 'linear-gradient(to right, #182E44, #FBF6E9)', 

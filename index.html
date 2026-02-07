@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Manrope:wght@200..800&display=swap"
       rel="stylesheet"
     />
 
@@ -125,7 +125,7 @@
       >
         <div class="space-y-8 text-center md:text-left">
           <h1
-            class="text-5xl md:text-7xl font-black leading-tight uppercase tracking-tighter text-bode-midnight"
+            class="font-serif text-5xl md:text-7xl font-black leading-tight uppercase tracking-tighter text-bode-midnight"
           >
             Art of <br />
             <span
@@ -164,10 +164,10 @@
               View PROPERTIES
             </a>
             <a
-              href="#about"
+              href="/contact.html"
               class="px-8 py-4 border-2 border-bode-midnight text-bode-midnight font-bold rounded-lg hover:bg-bode-midnight hover:text-white transition text-center"
             >
-              Our Vision
+              CONTACT US
             </a>
           </div>
         </div>
@@ -257,6 +257,25 @@
                 height: 220px;
               }
             }
+            /* --- إضافة: السكرول للموبايل فقط --- */
+            @media (max-width: 767px) {
+              /* 1. وقفنا الأنيميشن التلقائي وخفينا الصور */
+              .anim-right,
+              .anim-up {
+                opacity: 0;
+                animation: none;
+              }
+
+              /* 2. لما الجافاسكريبت يحط الكلاس ده، شغل الأنيميشن */
+              .start-anim .anim-right {
+                animation: slideInRight 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)
+                  forwards;
+              }
+              .start-anim .anim-up {
+                animation: slideInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)
+                  forwards;
+              }
+            }
           </style>
 
           <div class="overflow-hidden shadow-xl z-10 anim-right img-back">
@@ -275,6 +294,27 @@
             />
           </div>
         </div>
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            // لو الشاشة موبايل بس (أصغر من 768)
+            if (window.innerWidth < 768) {
+              const observer = new IntersectionObserver(
+                (entries) => {
+                  entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                      entry.target.classList.add("start-anim");
+                      observer.unobserve(entry.target); // اشتغل مرة واحدة بس
+                    }
+                  });
+                },
+                { threshold: 0.2 }
+              ); // يبدأ لما 20% من الصورة تبان
+
+              const target = document.querySelector(".hero-wrapper");
+              if (target) observer.observe(target);
+            }
+          });
+        </script>
       </div>
     </header>
 
@@ -287,7 +327,9 @@
             Why Choose BODE?
           </span>
 
-          <h2 class="text-4xl md:text-5xl font-black text-bode-midnight">
+          <h2
+            class="font-serif text-4xl md:text-5xl font-black text-bode-midnight"
+          >
             Building Trust, <br />
             <span
               class="bg-clip-text text-transparent bg-gradient-to-r from-bode-crimson to-bode-midnight font-bold"
